@@ -3,31 +3,33 @@ import {View, ScrollView, Alert} from 'react-native';
 import {Screenstyle} from '../style/screenStyle';
 import CustomInput from '../components/uı/customInput';
 import CustomButton from '../components/uı/customButton';
-import {useNavigation} from '@react-navigation/native';
 import SQLite from 'react-native-sqlite-storage';
-import Colors from '../theme/colors';
 
+import {useNavigation} from '@react-navigation/native';
+import Colors from '../theme/colors';
 const db = SQLite.openDatabase({
   name: 'userDB',
   createFromLocation: '~user.db',
 });
-const UserAdd = () => {
-  const [name, setName] = useState('');
-  const [surname, setsurname] = useState('');
-  const [phone, setPhone] = useState('');
-  const [photo, setPhoto] = useState('');
-  const [age, setAge] = useState('');
+
+const UserUpdate = ({route}) => {
+  const {user} = route.params;
+  const [name, setName] = useState(user.name);
+  const [surname, setsurname] = useState(user.surname);
+  const [phone, setPhone] = useState(user.phone);
+  const [photo, setPhoto] = useState(user.photo);
+  const [age, setAge] = useState(user.age);
   const navigation = useNavigation();
-  const insertUser = () => {
+  const updateUser = () => {
     db.transaction(txn => {
       txn.executeSql(
-        'INSERT INTO users (surname,name,phone,age,photo) VALUES (?,?,?,?,?)',
-        [surname, name, phone, age, photo],
+        'UPDATE users SET surname = ?, name = ?, phone = ?, age = ?, photo = ? WHERE id = ?',
+        [surname, name, phone, age, photo, user.id],
         (sqlTxn, res) => {
-          console.log(`${surname} ekleme başarılı`);
+          console.log(`${surname} güncelleme başarılı`);
           Alert.alert(
             'İşlem Başarılı',
-            `${name} ${surname} kişisi başarılı bir şekilde eklendi.`,
+            `${name} ${surname} kişisi başarılı bir şekilde güncellendi.`,
             [
               {
                 text: 'Tamam',
@@ -44,7 +46,7 @@ const UserAdd = () => {
         error => {
           Alert.alert(
             'İşlem Başarısız',
-            `${name} ${surname} kişisi eklenirken bir hata oluştu.`,
+            `${name} ${surname} kişisi güncellenirken bir hata oluştu.`,
             [
               {
                 text: 'Tamam',
@@ -89,12 +91,13 @@ const UserAdd = () => {
           value={age}
         />
         <CustomButton
-          bgColor={Colors.GREEN}
-          onPress={() => insertUser()}
-          title={'SAVE'}
+          bgColor={Colors.BLUE}
+          onPress={() => updateUser()}
+          title={'UPDATE'}
         />
       </ScrollView>
     </View>
   );
 };
-export default UserAdd;
+
+export default UserUpdate;

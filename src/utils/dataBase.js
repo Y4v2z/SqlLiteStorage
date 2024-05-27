@@ -1,3 +1,4 @@
+import {Alert} from 'react-native';
 import SQLite from 'react-native-sqlite-storage';
 SQLite.DEBUG(true);
 SQLite.enablePromise(true);
@@ -18,4 +19,38 @@ const creatTable = () => {
     });
   });
 };
+const getUsers = () => {
+  db.transaction(txn => {
+    txn.executeSql(
+      'SELECT * FROM users ORDER BY id DESC',
+      [],
+      (sqlTxn, res) => {
+        let length = res.rows.length;
+        let result = [];
+        if (length > 0) {
+          for (let i = 0; i < length; i++) {
+            let item = res.rows.item(i);
+            result.push(item);
+          }
+          // setUsers(result);
+        }
+      },
+      error => {
+        console.log('Kullanıcılar hata ' + error.message);
+      },
+    );
+  });
+};
+function deleteUser(userId) {
+  db.transaction(tx => {
+    tx.executeSql('DELETE FROM users WHERE id = ?', [userId], (tx, results) => {
+      if (results.rowsAffected > 0) {
+        console.log('Kullanıcı başarıyla silindi.');
+        // Kullanıcıları yeniden yükleme işlemi burada gerçekleştirilebilir.
+      } else {
+        console.log('Kullanıcı silinemedi.');
+      }
+    });
+  });
+}
 export {db, creatTable};

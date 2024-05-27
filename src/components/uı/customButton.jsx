@@ -5,9 +5,12 @@ import Colors from '../../theme/colors';
 
 // create a component
 const CustomButton = props => {
+  const {bgColor} = props;
   return (
     <View style={styles.container}>
-      <TouchableOpacity {...props} style={styles.button}>
+      <TouchableOpacity
+        {...props}
+        style={[styles.button, {backgroundColor: bgColor}]}>
         <Text style={styles.title}>{props.title}</Text>
       </TouchableOpacity>
     </View>

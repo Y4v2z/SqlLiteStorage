@@ -1,13 +1,33 @@
 //import liraries
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Pressable, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+  Linking,
+} from 'react-native';
 import Colors from '../theme/colors';
 import Avatar from './uı/avatar';
-import {Call} from 'iconsax-react-native';
+import {Call, Edit} from 'iconsax-react-native';
 import {compareUserName} from '../utils/function';
+import {useNavigation} from '@react-navigation/native';
+import {USERUPDATE} from '../utils/routes';
 
 // create a component
 const UserCard = ({item}) => {
+  const navigation = useNavigation();
+  const callPhone = () => {
+    const url = `tel:${item.phone}`;
+    Linking.canOpenURL(url).then(supported => {
+      if (supported) {
+        return Linking.openURL(url);
+      } else {
+        alert('Desteklenmeyen Telefon Numarası');
+      }
+    });
+  };
   return (
     <Pressable style={styles.container}>
       <View style={styles.imageContainer}>
@@ -20,9 +40,13 @@ const UserCard = ({item}) => {
         <Text style={styles.phone}>{item.phone}</Text>
       </View>
       <View style={styles.callContainer}>
-        <Pressable>
+        <TouchableOpacity onPress={callPhone}>
           <Call size={30} color={Colors.GREEN} />
-        </Pressable>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate(USERUPDATE, {user: item})}>
+          <Edit size={30} color={Colors.BLUE} />
+        </TouchableOpacity>
       </View>
     </Pressable>
   );
@@ -31,38 +55,35 @@ const UserCard = ({item}) => {
 // define your styles
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: 'row',
     padding: 5,
-    alignItems: 'center',
     marginVertical: 10,
     borderBottomWidth: 0.3,
     borderColor: Colors.GRAY,
-    // justifyContent: 'center',
   },
-
   name: {
     fontSize: 18,
     fontWeight: '700',
+  },
+  infoContainer: {
+    padding: 10,
+    flex: 3,
+  },
+  imageContainer: {
+    paddingHorizontal: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
   },
   phone: {
     color: Colors.GRAY,
     fontSize: 18,
   },
-  infoContainer: {
-    flex: 3,
-    padding: 10,
-  },
-  imageContainer: {
-    flex: 1,
-    paddingHorizontal: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   callContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'flex-end',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    flex: 2,
+    flexDirection: 'row',
   },
 });
 
